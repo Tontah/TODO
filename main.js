@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 heading.innerHTML=("Please enter a task");
             }
             else { if(heading.innerHTML==="Please enter a task"){
-                hading.innerHTML="todos";
+                heading.innerHTML="todos";
             }
                 addTodo(newToDoInput.value);
                 displayingToDos(newToDoInput.value);
