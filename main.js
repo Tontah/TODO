@@ -2,13 +2,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Array to hold todoitems
     let todoItems = [];
-   let newToDoInput = document.querySelector(".new-todo");
-   let todolist = document.querySelector(".todo-list");
-   let heading = document.querySelector(".todoapp h1");
-   let clearCompleted = document.querySelector(".clear-completed");
-   let active = document.querySelector(".active");
+    let newToDoInput = document.querySelector(".new-todo");
+    let todolist = document.querySelector(".todo-list");
+    let heading = document.querySelector(".todoapp h1");
+    let clearCompleted = document.querySelector(".clear-completed");
+    let active = document.querySelector(".active");
     let completed = document.querySelector(".completed");
-   let newToDoCount = 0;
+    let all = document.querySelector(".selected");
+    let newToDoCount = 0;
     newToDoInput.addEventListener("keypress", function (event){
         if (event.key === "Enter") {
             if(newToDoInput.value === ""){
@@ -18,12 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 heading.innerHTML = "todos";
             }
                 addTodo(newToDoInput.value);
-                displayingToDos(newToDoInput.value);
+                displayingToDos(todoItems);
                 incrementTodoCount();
                 newToDoInput.value = "";
             }
         }
-         console.log(event.target.value);
     });
     //This function increases the todo count
     function incrementTodoCount(){
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         newToDoCount--;
         document.querySelector(".todo-count").innerHTML = newToDoCount + " Item(s) left";
     }
-// This function pushes the text into the todo list
+// This function pushes the text into the todoItems array
     function addTodo(text) {
         let todo={
             task: text,
@@ -45,35 +45,53 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(todoItems);
     }
 //Showing the todolist
-    //The SPAn and div difference?????
-    function displayingToDos(text){
-        let todolistNode = document.createElement("li");
-        let deleteButton = document.createElement("SPAN");
-        deleteButton.className=("deleteButton");
-        let completeCheckbox = document.createElement("SPAN");
-        completeCheckbox.classList.add("completeCheckbox");
-        let remove = document.createElement("button");
-        remove.classList.add("remove");
-        remove.innerHTML = "\u00D7";
-        remove.addEventListener("click", deleteTask);
-        let complete = document.createElement("input");
-        complete.type = "checkbox";
-        complete.classList.add("complete");
-        complete.addEventListener("click", completeTask)
-        deleteButton.appendChild(remove);
-        completeCheckbox.appendChild(complete);
-        todolistNode.appendChild(completeCheckbox);
-        todolistNode.appendChild(document.createTextNode(text));
-        todolistNode.appendChild(deleteButton);
-        todolist.appendChild(todolistNode);
-
+    function displayingToDos(tasks){
+        todolist.innerHTML="";
+        tasks.forEach(element => {
+            todolist.appendChild(creatingULElements(element));
+        })
+    }
+    //This function creates the listnode with the task
+    function creatingULElements(task){
+        const todolistNodeChecked = document.createElement("li");
+        todolistNodeChecked.className="completed";
+        const todolistNodeUnchecked = document.createElement("li");
+        const div1=document.createElement("div");
+        div1.className="view";
+        const toggle=document.createElement("input");
+        toggle.className="toggle";
+        toggle.type="checkbox";
+        toggle.addEventListener("click", completeTask);
+        const label=document.createElement("label");
+        const labelText=document.createTextNode(task.task);
+        label.appendChild(labelText);
+        const deleteButton=document.createElement("button");
+        deleteButton.className="destroy";
+        deleteButton.addEventListener("click", deleteTask);
+        if (task.completed) {
+            toggle.setAttribute("checked","");
+            div1.appendChild(toggle);
+            console.log(toggle);
+            div1.appendChild(label);
+            div1.appendChild(deleteButton);
+            todolistNodeChecked.appendChild(div1);
+            return todolistNodeChecked;
+        }
+        else {
+            div1.appendChild(toggle);
+            console.log(toggle);
+            div1.appendChild(label);
+            div1.appendChild(deleteButton);
+            todolistNodeUnchecked.appendChild(div1);
+            return todolistNodeUnchecked;
+        }
     }
     //deletes a task wrt the button clicked
     function deleteTask() {
         let completedState = false;
-        //gets the list node of the button(Button->span->"Li")
+        //gets the list node of the button(Button->div->"Li")
         let deleteTODO = this.parentNode.parentNode
-        console.log("deletetodo="+deleteTODO.textContent);
+        //console.log("deletetodo="+deleteTODO.textContent);
         // grab the `ul` (li -> ul)
         let parent = deleteTODO.parentNode
         // remove `li` from `ul`
@@ -82,13 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < todoItems.length; i++) {
             //compares if the item[i] of the array equals the element to be deleted
             //why is the delete button representative present in my tasktext??
-            if ((todoItems[i].task+"\u00D7") === deleteTODO.textContent) {
+            if ((todoItems[i].task) === deleteTODO.textContent) {
                 completedState=todoItems[i].completed;
                 todoItems.splice(i, 1);
                 break;
             }
         }
-        if (completedState === true){
+        if (completedState){
         }
         else {
             decrementTodoCount()
@@ -97,38 +115,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // marks a task as completed
     function completeTask(){
-        let todo = this.parentNode.parentNode
-        for (let i = 0; i < todoItems.length; i++) {
-            if ((todoItems[i].task + "\u00D7") === todo.textContent) {
-                if (todoItems[i].completed === true){
-                    todo.style.textDecoration = "none";
-                    todo.style.backgroundColor = "white";
-                    todoItems[i].completed = false;
+        let todo=this.parentNode;
+        console.log(todo);
+        for (let i=0;i<todoItems.length;i++){
+            console.log("completedTask");
+            console.log( "todoItems[i]1= " +todoItems[i].task);
+            console.log( "todo.textcontent1= " +todo.textContent);
+            if(todoItems[i].task===todo.textContent){
+                if(todoItems[i].completed){
                     incrementTodoCount();
                 }
-                else{
-                    todo.style.textDecoration = "line-through";
-                    todo.style.backgroundColor = "darkgrey";
-                    todoItems[i].completed = true;
+                else {
                     decrementTodoCount();
                 }
+                todoItems[i].completed=!todoItems[i].completed;
+                displayingToDos(todoItems);
             }
         }
+
         console.log(todoItems);
     }
     //deletes all tasks marked as completed
     clearCompleted.addEventListener("click", deleteAllCompleted);
     function deleteAllCompleted(){
-        let completedItems=[];
+        let nonCompletedItems=[];
         todoItems.forEach(element => {
             if (element.completed === false) {
-                completedItems.push(element);
+                nonCompletedItems.push(element);
             }
             else {
                 deleteTasks(element.task);
             }
         });
-        todoItems=completedItems
+        todoItems=nonCompletedItems
+        displayingToDos(todoItems);
         console.log(todoItems);
     }
     //Deletes task with the help of a task text
@@ -140,14 +160,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    active.addEventListener("click", showActiveList);
-    completed.addEventListener("click", showCompletedList);
+    completed.addEventListener("click",showCompletedList);
+    active.addEventListener("click",showActiveList);
+    //show all todos
+    all.addEventListener("click", ()=>{
+        displayingToDos(todoItems);
+    })
     //shows the list of active tasks
     function showActiveList(){
+        const active=todoItems.filter(function (e){
+            return e.completed===false;
+        })
+        return displayingToDos(active);
         console.log(todoItems);
     }
+    //show the list of all completed tasks
     function showCompletedList(){
-
+        const completed=todoItems.filter(function (e){
+            return e.completed===true;
+        })
+        return displayingToDos(completed);
+        console.log(todoItems);
     }
 })
 
