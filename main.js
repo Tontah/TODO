@@ -1,7 +1,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Array to hold todoitems
-    let todoItems = [];
+    let todoItems = []; // Array to hold todoitems
     let newToDoInput = document.querySelector(".new-todo");
     let todolist = document.querySelector(".todo-list");
     let heading = document.querySelector(".todoapp h1");
@@ -15,10 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if(newToDoInput.value === ""){
                 heading.innerHTML = ("Please enter a task");
             }
-            else { if(heading.innerHTML === "Please enter a task"){
-                heading.innerHTML = "todos";
-            }
-                addTodo(newToDoInput.value);
+            else {
+                if(heading.innerHTML === "Please enter a task"){
+                    heading.innerHTML = "todos";
+                }
+                 addTodo(newToDoInput.value);
                 displayingToDos(todoItems);
                 incrementTodoCount();
                 newToDoInput.value = "";
@@ -71,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (task.completed) {
             toggle.setAttribute("checked","");
             div1.appendChild(toggle);
-            console.log(toggle);
             div1.appendChild(label);
             div1.appendChild(deleteButton);
             todolistNodeChecked.appendChild(div1);
@@ -79,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         else {
             div1.appendChild(toggle);
-            console.log(toggle);
             div1.appendChild(label);
             div1.appendChild(deleteButton);
             todolistNodeUnchecked.appendChild(div1);
@@ -90,16 +88,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function deleteTask() {
         let completedState = false;
         //gets the list node of the button(Button->div->"Li")
-        let deleteTODO = this.parentNode.parentNode
-        //console.log("deletetodo="+deleteTODO.textContent);
+        let deleteTODO = this.parentNode.parentNode;
         // grab the `ul` (li -> ul)
-        let parent = deleteTODO.parentNode
+        let parent = deleteTODO.parentNode;
         // remove `li` from `ul`
         parent.removeChild(deleteTODO)
         //deleting the task from the array as well
         for (let i = 0; i < todoItems.length; i++) {
             //compares if the item[i] of the array equals the element to be deleted
-            //why is the delete button representative present in my tasktext??
             if ((todoItems[i].task) === deleteTODO.textContent) {
                 completedState=todoItems[i].completed;
                 todoItems.splice(i, 1);
@@ -116,11 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // marks a task as completed
     function completeTask(){
         let todo=this.parentNode;
-        console.log(todo);
         for (let i=0;i<todoItems.length;i++){
-            console.log("completedTask");
-            console.log( "todoItems[i]1= " +todoItems[i].task);
-            console.log( "todo.textcontent1= " +todo.textContent);
             if(todoItems[i].task===todo.textContent){
                 if(todoItems[i].completed){
                     incrementTodoCount();
@@ -132,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 displayingToDos(todoItems);
             }
         }
-
         console.log(todoItems);
     }
     //deletes all tasks marked as completed
@@ -155,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function deleteTasks(text){
         let ulNodes=todolist.childNodes;
         for (let i = 0;i<ulNodes.length;i++){
-            if (ulNodes[i].textContent === (text+"\u00D7")){
+            if (ulNodes[i].textContent === text){
                 todolist.removeChild(todolist.childNodes[i]);
             }
         }
